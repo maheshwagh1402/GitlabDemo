@@ -1,0 +1,72 @@
+stages:
+    - stage_gitlab_checkout 
+    - stage_unit_test 
+    - stage_build
+    - stage_static_code_analysis
+    - stage_deploy_QA
+    - stage_selenium_test
+    - approval
+    - stage_deploy_PROD
+
+
+checkout:
+    stage: stage_gitlab_checkout             
+    script:
+      - echo 'hello world'
+
+
+unit test:
+    stage: stage_unit_test 
+    script:
+       - mvn $MAVEN_CLI_OPTS  -Dtest=LoginApplicationTests test
+      
+      
+build:
+    stage: stage_build 
+    script:
+      - mvn  deploy -DskipTests
+  #   - mvn $MAVEN_CLI_OPTS  package -DskipTests
+  #   - cd /builds/akshaytiwari29/GitlabWebApp/target/
+     
+#     -  mv /var/lib/gitlab-runner/builds/a6mStEt3/0/akshaytiwari29/GitlabWebApp/target/sample123.war  /var/lib/tomcat8/webapps/
+#     - cd /opt/repo/ && ls
+
+
+
+static_code_analysis:
+   stage: stage_static_code_analysis
+   script:
+       - git clone https://github.com/akshaytiwari29/akshay1.git
+       - cd akshay1
+       -  mvn  clean package sonar:sonar -Dmaven.test.failure.ignore=true -Dsonar.host.url=http://34.73.115.229:9000 -Dsonar.login=08bd28b5752ee16563b268013dd48b4c3b0c0d2f
+
+
+deploy_QA:
+   stage: stage_deploy_QA
+   script:
+     - echo "hello world" 
+      
+      
+selenium test:
+    stage: stage_selenium_test 
+    script:
+       - echo 'hello world'
+       - mvn $MAVEN_CLI_OPTS  -Dtest=SeleniumTest test -Dmaven.test.failure.ignore=true
+      
+      
+Proceed?:
+  stage: approval
+  script:
+    - echo 'hello world'
+  when: manual
+  allow_failure: false
+  
+  
+deploy_PROD:
+  stage: stage_deploy_PROD
+  script:
+     -  echo "hello world"
+  when: on_success
+
+
+
